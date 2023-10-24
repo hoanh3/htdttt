@@ -11,11 +11,11 @@ import vn.htdttt.btl.projection.ResultSet;
 @Getter
 @Setter
 public class ChieuCaoDto {
-    private int ratThap;
-    private int thap;
-    private int trungBinh;
-    private int cao;
-    private int ratCao;
+    private double ratThap;
+    private double thap;
+    private double trungBinh;
+    private double cao;
+    private double ratCao;
 
     public ChieuCaoDto(ResultSet resultSet) {
         this.ratThap = resultSet.getRatThap();

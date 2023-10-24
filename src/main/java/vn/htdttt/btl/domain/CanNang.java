@@ -25,13 +25,13 @@ public class CanNang {
     @Column(name = "gioi_tinh")
     private String gioiTinh;
     @Column(name = "rat_coi")
-    private int ratCoi;
+    private double ratCoi;
     @Column(name = "coi")
-    private int coi;
+    private double coi;
     @Column(name = "trung_binh")
-    private int trungBinh;
+    private double trungBinh;
     @Column(name = "beo")
-    private int beo;
+    private double beo;
     @Column(name = "beo_phi")
-    private int beoPhi;
+    private double beoPhi;
 }

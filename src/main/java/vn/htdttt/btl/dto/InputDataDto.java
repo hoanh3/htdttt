@@ -11,8 +11,8 @@ import lombok.Setter;
 @Setter
 @Getter
 public class InputDataDto {
-    private int chieuCao;
-    private int canNang;
+    private double chieuCao;
+    private double canNang;
     private int tuoi;
     private String gioiTinh;
 }

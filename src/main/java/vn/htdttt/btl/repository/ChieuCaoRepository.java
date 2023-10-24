@@ -9,7 +9,6 @@ import vn.htdttt.btl.projection.ResultSet;
 
 @Repository
 public interface ChieuCaoRepository extends JpaRepository<ChieuCao, Integer> {
-
     @Query(value = "SELECT  " +
             " cao.rat_thap ratThap , " +
             " cao.thap thap ,  " +

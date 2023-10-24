@@ -10,9 +10,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CanNangDto {
-    private int ratCoi;
-    private int coi;
-    private int trungBinh;
-    private int beo;
-    private int beoPhi;
+    private double ratCoi;
+    private double coi;
+    private double trungBinh;
+    private double beo;
+    private double beoPhi;
 }

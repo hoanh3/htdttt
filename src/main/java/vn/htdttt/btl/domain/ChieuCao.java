@@ -25,13 +25,13 @@ public class ChieuCao {
     @Column(name = "gioi_tinh")
     private String gioiTinh;
     @Column(name = "rat_thap")
-    private int ratThap;
+    private double ratThap;
     @Column(name = "thap")
-    private int thap;
+    private double thap;
     @Column(name = "trung_binh")
-    private int trungBinh;
+    private double trungBinh;
     @Column(name = "cao")
-    private int cao;
+    private double cao;
     @Column(name = "rat_cao")
-    private int ratCao;
+    private double ratCao;
 }

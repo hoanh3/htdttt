@@ -10,9 +10,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class FuzzyCanNang {
-    private float ratCoi;
-    private float coi;
-    private float trungBinh;
-    private float beo;
-    private float beoPhi;
+    private double ratCoi;
+    private double coi;
+    private double trungBinh;
+    private double beo;
+    private double beoPhi;
 }
