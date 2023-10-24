@@ -6,4 +6,8 @@ public interface ResultSet {
     double getTrungBinh();
     double getCao();
     double getRatCao();
+    double getRatCoi();
+    double getCoi();
+    double getBeo();
+    double getBeoPhi();
 }

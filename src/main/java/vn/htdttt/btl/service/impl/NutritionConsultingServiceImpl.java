@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import vn.htdttt.btl.consts.Consts;
 import vn.htdttt.btl.dto.*;
 import vn.htdttt.btl.projection.ResultSet;
+import vn.htdttt.btl.repository.CanNangRepository;
 import vn.htdttt.btl.repository.ChieuCaoRepository;
 import vn.htdttt.btl.service.NutritionConsultingService;
 
@@ -14,12 +15,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NutritionConsultingServiceImpl implements NutritionConsultingService {
     private final ChieuCaoRepository chieuCaoRepository;
+    private final CanNangRepository canNangRepository;
 
     @Override
     public List<AnswerDto> getResponse(InputDataDto inputDataDto) {
-        ResultSet rsChieuCao = chieuCaoRepository.getByTuoiAndGioiTinh(inputDataDto.getTuoi(), inputDataDto.getGioiTinh());
+        int tuoi = inputDataDto.getTuoi();
+        String gioiTinh = inputDataDto.getGioiTinh();
+        ResultSet rsChieuCao = chieuCaoRepository.getByTuoiAndGioiTinh(tuoi, gioiTinh);
+        ResultSet rsCanNang = canNangRepository.getByTuoiAndGioiTinh(tuoi, gioiTinh);
         ChieuCaoDto chieuCaoDto = new ChieuCaoDto(rsChieuCao);
+        CanNangDto canNangDto = new CanNangDto(rsCanNang);
         FuzzyChieuCao fuzzyChieuCao = getFuzzyChieuCao(chieuCaoDto, inputDataDto.getChieuCao());
+        FuzzyCanNang fuzzyCanNang = getFuzzyCanNang(canNangDto, inputDataDto.getCanNang());
         return null;
     }
 
@@ -40,7 +47,7 @@ public class NutritionConsultingServiceImpl implements NutritionConsultingServic
         if (chieuCao >= chieuCaoDto.getRatThap() + Consts.saiSo && chieuCao < chieuCaoDto.getThap()) {
             thap = (chieuCao - (chieuCaoDto.getRatThap() + Consts.saiSo))
                     / (chieuCaoDto.getThap() - (Consts.saiSo + chieuCaoDto.getRatThap()));
-        } else if (chieuCao <= chieuCaoDto.getTrungBinh() - Consts.saiSo) {
+        } else if (chieuCao <= chieuCaoDto.getTrungBinh() - Consts.saiSo && chieuCao >= chieuCaoDto.getThap()) {
             thap = ((chieuCaoDto.getTrungBinh() - Consts.saiSo) - chieuCao)
                     / ((chieuCaoDto.getTrungBinh() - Consts.saiSo) - chieuCaoDto.getThap());
         } else {
@@ -51,7 +58,7 @@ public class NutritionConsultingServiceImpl implements NutritionConsultingServic
         if (chieuCao >= chieuCaoDto.getThap() + Consts.saiSo && chieuCao < chieuCaoDto.getTrungBinh()) {
             trungBinh = (chieuCao - (chieuCaoDto.getThap() + Consts.saiSo))
                     / (chieuCaoDto.getTrungBinh() - (Consts.saiSo + chieuCaoDto.getThap()));
-        } else if (chieuCao <= chieuCaoDto.getCao() - Consts.saiSo) {
+        } else if (chieuCao <= chieuCaoDto.getCao() - Consts.saiSo && chieuCao >= chieuCaoDto.getTrungBinh()) {
             trungBinh = ((chieuCaoDto.getCao() - Consts.saiSo) - chieuCao)
                     / ((chieuCaoDto.getCao() - Consts.saiSo) - chieuCaoDto.getTrungBinh());
         } else {
@@ -62,7 +69,7 @@ public class NutritionConsultingServiceImpl implements NutritionConsultingServic
         if (chieuCao >= chieuCaoDto.getTrungBinh() + Consts.saiSo && chieuCao < chieuCaoDto.getCao()) {
             cao = (chieuCao - (chieuCaoDto.getTrungBinh() + Consts.saiSo))
                     / (chieuCaoDto.getCao() - (Consts.saiSo + chieuCaoDto.getTrungBinh()));
-        } else if (chieuCao <= chieuCaoDto.getRatCao() - Consts.saiSo) {
+        } else if (chieuCao <= chieuCaoDto.getRatCao() - Consts.saiSo && chieuCao >= chieuCaoDto.getCao()) {
             cao = ((chieuCaoDto.getRatCao() - Consts.saiSo) - chieuCao)
                     / ((chieuCaoDto.getRatCao() - Consts.saiSo) - chieuCaoDto.getCao());
         } else {
@@ -73,7 +80,7 @@ public class NutritionConsultingServiceImpl implements NutritionConsultingServic
         if (chieuCao >= chieuCaoDto.getCao() + Consts.saiSo && chieuCao < chieuCaoDto.getRatCao()) {
             ratCao = (chieuCao - (chieuCaoDto.getCao() + Consts.saiSo))
                     / (chieuCaoDto.getRatCao() - (Consts.saiSo + chieuCaoDto.getCao()));
-        } else {
+        } else if(chieuCao >= chieuCaoDto.getRatCao()){
             ratCao = 1.0;
         }
         fuzzyChieuCao.setRatCao(ratCao);
@@ -84,7 +91,7 @@ public class NutritionConsultingServiceImpl implements NutritionConsultingServic
         return fuzzyChieuCao;
     }
 
-    private FuzzyCanNang getFuzzyCanNang(CanNangDto canNangDto, int canNang) {
+    private FuzzyCanNang getFuzzyCanNang(CanNangDto canNangDto, double canNang) {
         FuzzyCanNang fuzzyCanNang = new FuzzyCanNang();
 
         double ratCoi = 0.0;
@@ -101,7 +108,7 @@ public class NutritionConsultingServiceImpl implements NutritionConsultingServic
         if (canNang >= canNangDto.getRatCoi() + Consts.saiSo && canNang < canNangDto.getCoi()) {
             coi = (canNang - (canNangDto.getRatCoi() + Consts.saiSo))
                     / (canNangDto.getCoi() - (Consts.saiSo + canNangDto.getRatCoi()));
-        } else if (canNang <= canNangDto.getTrungBinh() - Consts.saiSo) {
+        } else if (canNang <= canNangDto.getTrungBinh() - Consts.saiSo && canNang >= canNangDto.getCoi()) {
             coi = ((canNangDto.getTrungBinh() - Consts.saiSo) - canNang)
                     / ((canNangDto.getTrungBinh() - Consts.saiSo) - canNangDto.getCoi());
         } else {
@@ -112,7 +119,7 @@ public class NutritionConsultingServiceImpl implements NutritionConsultingServic
         if (canNang >= canNangDto.getCoi() + Consts.saiSo && canNang < canNangDto.getTrungBinh()) {
             trungBinh = (canNang - (canNangDto.getCoi() + Consts.saiSo))
                     / (canNangDto.getTrungBinh() - (Consts.saiSo + canNangDto.getCoi()));
-        } else if (canNang <= canNangDto.getBeo() - Consts.saiSo) {
+        } else if (canNang <= canNangDto.getBeo() - Consts.saiSo && canNang >= canNangDto.getTrungBinh()) {
             trungBinh = ((canNangDto.getBeo() - Consts.saiSo) - canNang)
                     / ((canNangDto.getBeo() - Consts.saiSo) - canNangDto.getTrungBinh());
         } else {
@@ -123,7 +130,7 @@ public class NutritionConsultingServiceImpl implements NutritionConsultingServic
         if (canNang >= canNangDto.getTrungBinh() + Consts.saiSo && canNang < canNangDto.getBeo()) {
             beo = (canNang - (canNangDto.getTrungBinh() + Consts.saiSo))
                     / (canNangDto.getBeo() - (Consts.saiSo + canNangDto.getTrungBinh()));
-        } else if (canNang <= canNangDto.getBeoPhi() - Consts.saiSo) {
+        } else if (canNang <= canNangDto.getBeoPhi() - Consts.saiSo && canNang >= canNangDto.getBeo()) {
             beo = ((canNangDto.getBeoPhi() - Consts.saiSo) - canNang)
                     / ((canNangDto.getBeoPhi() - Consts.saiSo) - canNangDto.getBeo());
         } else {
@@ -134,7 +141,7 @@ public class NutritionConsultingServiceImpl implements NutritionConsultingServic
         if (canNang >= canNangDto.getBeo() + Consts.saiSo && canNang < canNangDto.getBeoPhi()) {
             beoPhi = (canNang - (canNangDto.getBeo() + Consts.saiSo))
                     / (canNangDto.getBeoPhi() - (Consts.saiSo + canNangDto.getBeo()));
-        } else {
+        } else if (canNang >= canNangDto.getBeoPhi()){
             beoPhi = 1.0;
         }
         fuzzyCanNang.setBeoPhi(beoPhi);
