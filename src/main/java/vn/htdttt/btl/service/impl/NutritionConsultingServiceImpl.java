@@ -8,10 +8,7 @@ import vn.htdttt.btl.consts.*;
 import vn.htdttt.btl.domain.LuatDinhDuong;
 import vn.htdttt.btl.dto.*;
 import vn.htdttt.btl.projection.ResultSet;
-import vn.htdttt.btl.repository.CanNangRepository;
-import vn.htdttt.btl.repository.ChieuCaoRepository;
-import vn.htdttt.btl.repository.LuatDinhDuongRepository;
-import vn.htdttt.btl.repository.TheChatRepository;
+import vn.htdttt.btl.repository.*;
 import vn.htdttt.btl.service.NutritionConsultingService;
 
 import java.util.*;
@@ -23,6 +20,7 @@ public class NutritionConsultingServiceImpl implements NutritionConsultingServic
     private final CanNangRepository canNangRepository;
     private final LuatDinhDuongRepository luatDinhDuongRepository;
     private final TheChatRepository theChatRepository;
+    private final TuVanRepository tuVanRepository;
 
     @Override
     public List<AnswerDto> getResponse(InputDataDto inputDataDto) throws JsonProcessingException {
@@ -38,11 +36,15 @@ public class NutritionConsultingServiceImpl implements NutritionConsultingServic
         TheChatDto theChatDto = giaiMo(fuzzyDinhDuong);
         List<AnswerDto> result = new ArrayList<>();
         result.add(new AnswerDto(getTuVanTheChat(theChatDto)));
+        TuVanDto tuVanDto = tuVanRepository.getByMucDo(theChatDto.getMucDo());
+        result.add(new AnswerDto(tuVanDto.getLoiKhuyen()));
+        result.add(new AnswerDto(tuVanDto.getThucPham()));
+        result.add(new AnswerDto(tuVanDto.getChiTiet()));
         return result;
     }
 
     private String getTuVanTheChat(TheChatDto theChatDto) {
-        String result = String.format("Dựa trên thông số bạn đưa ra, chúng tôi đánh giá thể chất thuộc mức: %s! Cấp độ: %d.", theChatDto.getTenTheChat(), theChatDto.getMucDo());;
+        String result = String.format("Dựa trên thông số bạn đưa ra, chúng tôi đánh giá thể chất thuộc mức: %s! <br> Cấp độ: %d.", theChatDto.getTenTheChat().toUpperCase(), theChatDto.getMucDo());;
         return result;
     }
 
