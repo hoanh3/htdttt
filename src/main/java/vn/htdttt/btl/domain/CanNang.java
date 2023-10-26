@@ -30,8 +30,8 @@ public class CanNang {
     private double coi;
     @Column(name = "trung_binh")
     private double trungBinh;
-    @Column(name = "beo")
-    private double beo;
-    @Column(name = "beo_phi")
-    private double beoPhi;
+    @Column(name = "nang")
+    private double nang;
+    @Column(name = "rat_nang")
+    private double ratNang;
 }

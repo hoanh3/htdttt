@@ -1,13 +1,14 @@
 package vn.htdttt.btl.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import vn.htdttt.btl.consts.*;
+import vn.htdttt.btl.commons.AnswerDto;
+import vn.htdttt.btl.consts.LoaiCanNang;
+import vn.htdttt.btl.consts.LoaiChieuCao;
+import vn.htdttt.btl.consts.QuyTacDinhDuong;
+import vn.htdttt.btl.consts.TheChat;
 import vn.htdttt.btl.domain.LuatDinhDuong;
 import vn.htdttt.btl.dto.*;
-import vn.htdttt.btl.projection.ResultSet;
 import vn.htdttt.btl.repository.*;
 import vn.htdttt.btl.service.NutritionConsultingService;
 
@@ -23,13 +24,11 @@ public class NutritionConsultingServiceImpl implements NutritionConsultingServic
     private final TuVanRepository tuVanRepository;
 
     @Override
-    public List<AnswerDto> getResponse(InputDataDto inputDataDto) throws JsonProcessingException {
+    public List<AnswerDto> getResponse(InputDataDto inputDataDto) {
         int tuoi = inputDataDto.getTuoi();
         String gioiTinh = inputDataDto.getGioiTinh();
-        ResultSet rsChieuCao = chieuCaoRepository.getByTuoiAndGioiTinh(tuoi, gioiTinh);
-        ResultSet rsCanNang = canNangRepository.getByTuoiAndGioiTinh(tuoi, gioiTinh);
-        ChieuCaoDto chieuCaoDto = new ChieuCaoDto(rsChieuCao);
-        CanNangDto canNangDto = new CanNangDto(rsCanNang);
+        ChieuCaoDto chieuCaoDto = chieuCaoRepository.getByTuoiAndGioiTinh(tuoi, gioiTinh);
+        CanNangDto canNangDto = canNangRepository.getByTuoiAndGioiTinh(tuoi, gioiTinh);
         FuzzyChieuCao fuzzyChieuCao = getFuzzyChieuCao(chieuCaoDto, inputDataDto.getChieuCao());
         FuzzyCanNang fuzzyCanNang = getFuzzyCanNang(canNangDto, inputDataDto.getCanNang());
         FuzzyDinhDuong fuzzyDinhDuong = getFuzzyDinhDuong(fuzzyCanNang, fuzzyChieuCao);
@@ -140,8 +139,8 @@ public class NutritionConsultingServiceImpl implements NutritionConsultingServic
         canNang.put(LoaiCanNang.RAT_COI.getColumnName(), fuzzyCanNang.getRatCoi());
         canNang.put(LoaiCanNang.COI.getColumnName(), fuzzyCanNang.getCoi());
         canNang.put(LoaiCanNang.TRUNG_BINH.getColumnName(), fuzzyCanNang.getTrungBinh());
-        canNang.put(LoaiCanNang.BEO.getColumnName(), fuzzyCanNang.getBeo());
-        canNang.put(LoaiCanNang.BEO_PHI.getColumnName(), fuzzyCanNang.getBeoPhi());
+        canNang.put(LoaiCanNang.NANG.getColumnName(), fuzzyCanNang.getNang());
+        canNang.put(LoaiCanNang.RAT_NANG.getColumnName(), fuzzyCanNang.getRatNang());
 
         FuzzyDinhDuong fuzzyDinhDuong = new FuzzyDinhDuong();
         for(Map.Entry<String, Double> cao : chieuCao.entrySet()) {
@@ -177,50 +176,50 @@ public class NutritionConsultingServiceImpl implements NutritionConsultingServic
         double ratThap = 0.0;
         if (chieuCao <= chieuCaoDto.getRatThap()) {
             ratThap = 1.0;
-        } else if (chieuCao <= chieuCaoDto.getThap() - Consts.saiSo) {
-            ratThap = ((chieuCaoDto.getThap() - Consts.saiSo) - chieuCao)
-                    / ((chieuCaoDto.getThap() - Consts.saiSo) - chieuCaoDto.getRatThap());
+        } else if (chieuCao <= chieuCaoDto.getThap()) {
+            ratThap = ((chieuCaoDto.getThap()) - chieuCao)
+                    / ((chieuCaoDto.getThap()) - chieuCaoDto.getRatThap());
         } else {
             ratThap = 0.0;
         }
 
         double thap = 0.0;
-        if (chieuCao >= chieuCaoDto.getRatThap() + Consts.saiSo && chieuCao < chieuCaoDto.getThap()) {
-            thap = (chieuCao - (chieuCaoDto.getRatThap() + Consts.saiSo))
-                    / (chieuCaoDto.getThap() - (Consts.saiSo + chieuCaoDto.getRatThap()));
-        } else if (chieuCao <= chieuCaoDto.getTrungBinh() - Consts.saiSo && chieuCao >= chieuCaoDto.getThap()) {
-            thap = ((chieuCaoDto.getTrungBinh() - Consts.saiSo) - chieuCao)
-                    / ((chieuCaoDto.getTrungBinh() - Consts.saiSo) - chieuCaoDto.getThap());
+        if (chieuCao >= chieuCaoDto.getRatThap() && chieuCao < chieuCaoDto.getThap()) {
+            thap = (chieuCao - (chieuCaoDto.getRatThap()))
+                    / (chieuCaoDto.getThap() - (chieuCaoDto.getRatThap()));
+        } else if (chieuCao <= chieuCaoDto.getTrungBinh() && chieuCao >= chieuCaoDto.getThap()) {
+            thap = ((chieuCaoDto.getTrungBinh()) - chieuCao)
+                    / ((chieuCaoDto.getTrungBinh()) - chieuCaoDto.getThap());
         } else {
             thap = 0.0;
         }
 
         double trungBinh = 0.0;
-        if (chieuCao >= chieuCaoDto.getThap() + Consts.saiSo && chieuCao < chieuCaoDto.getTrungBinh()) {
-            trungBinh = (chieuCao - (chieuCaoDto.getThap() + Consts.saiSo))
-                    / (chieuCaoDto.getTrungBinh() - (Consts.saiSo + chieuCaoDto.getThap()));
-        } else if (chieuCao <= chieuCaoDto.getCao() - Consts.saiSo && chieuCao >= chieuCaoDto.getTrungBinh()) {
-            trungBinh = ((chieuCaoDto.getCao() - Consts.saiSo) - chieuCao)
-                    / ((chieuCaoDto.getCao() - Consts.saiSo) - chieuCaoDto.getTrungBinh());
+        if (chieuCao >= chieuCaoDto.getThap() && chieuCao < chieuCaoDto.getTrungBinh()) {
+            trungBinh = (chieuCao - (chieuCaoDto.getThap()))
+                    / (chieuCaoDto.getTrungBinh() - (chieuCaoDto.getThap()));
+        } else if (chieuCao <= chieuCaoDto.getCao() && chieuCao >= chieuCaoDto.getTrungBinh()) {
+            trungBinh = ((chieuCaoDto.getCao()) - chieuCao)
+                    / ((chieuCaoDto.getCao()) - chieuCaoDto.getTrungBinh());
         } else {
             trungBinh = 0.0;
         }
 
         double cao = 0.0;
-        if (chieuCao >= chieuCaoDto.getTrungBinh() + Consts.saiSo && chieuCao < chieuCaoDto.getCao()) {
-            cao = (chieuCao - (chieuCaoDto.getTrungBinh() + Consts.saiSo))
-                    / (chieuCaoDto.getCao() - (Consts.saiSo + chieuCaoDto.getTrungBinh()));
-        } else if (chieuCao <= chieuCaoDto.getRatCao() - Consts.saiSo && chieuCao >= chieuCaoDto.getCao()) {
-            cao = ((chieuCaoDto.getRatCao() - Consts.saiSo) - chieuCao)
-                    / ((chieuCaoDto.getRatCao() - Consts.saiSo) - chieuCaoDto.getCao());
+        if (chieuCao >= chieuCaoDto.getTrungBinh() && chieuCao < chieuCaoDto.getCao()) {
+            cao = (chieuCao - (chieuCaoDto.getTrungBinh()))
+                    / (chieuCaoDto.getCao() - (chieuCaoDto.getTrungBinh()));
+        } else if (chieuCao <= chieuCaoDto.getRatCao() && chieuCao >= chieuCaoDto.getCao()) {
+            cao = ((chieuCaoDto.getRatCao()) - chieuCao)
+                    / ((chieuCaoDto.getRatCao()) - chieuCaoDto.getCao());
         } else {
             cao = 0.0;
         }
 
         double ratCao = 0.0;
-        if (chieuCao >= chieuCaoDto.getCao() + Consts.saiSo && chieuCao < chieuCaoDto.getRatCao()) {
-            ratCao = (chieuCao - (chieuCaoDto.getCao() + Consts.saiSo))
-                    / (chieuCaoDto.getRatCao() - (Consts.saiSo + chieuCaoDto.getCao()));
+        if (chieuCao >= chieuCaoDto.getCao() && chieuCao < chieuCaoDto.getRatCao()) {
+            ratCao = (chieuCao - (chieuCaoDto.getCao()))
+                    / (chieuCaoDto.getRatCao() - (chieuCaoDto.getCao()));
         } else if(chieuCao >= chieuCaoDto.getRatCao()){
             ratCao = 1.0;
         }
@@ -238,55 +237,55 @@ public class NutritionConsultingServiceImpl implements NutritionConsultingServic
         double ratCoi = 0.0;
         if (canNang <= canNangDto.getRatCoi()) {
             ratCoi = 1.0;
-        } else if (canNang <= canNangDto.getCoi() - Consts.saiSo) {
-            ratCoi = ((canNangDto.getCoi() - Consts.saiSo) - canNang)
-                    / ((canNangDto.getCoi() - Consts.saiSo) - canNangDto.getRatCoi());
+        } else if (canNang <= canNangDto.getCoi()) {
+            ratCoi = ((canNangDto.getCoi()) - canNang)
+                    / ((canNangDto.getCoi()) - canNangDto.getRatCoi());
         } else {
             ratCoi = 0.0;
         }
 
         double coi = 0.0;
-        if (canNang >= canNangDto.getRatCoi() + Consts.saiSo && canNang < canNangDto.getCoi()) {
-            coi = (canNang - (canNangDto.getRatCoi() + Consts.saiSo))
-                    / (canNangDto.getCoi() - (Consts.saiSo + canNangDto.getRatCoi()));
-        } else if (canNang <= canNangDto.getTrungBinh() - Consts.saiSo && canNang >= canNangDto.getCoi()) {
-            coi = ((canNangDto.getTrungBinh() - Consts.saiSo) - canNang)
-                    / ((canNangDto.getTrungBinh() - Consts.saiSo) - canNangDto.getCoi());
+        if (canNang >= canNangDto.getRatCoi() && canNang < canNangDto.getCoi()) {
+            coi = (canNang - (canNangDto.getRatCoi()))
+                    / (canNangDto.getCoi() - (canNangDto.getRatCoi()));
+        } else if (canNang <= canNangDto.getTrungBinh() && canNang >= canNangDto.getCoi()) {
+            coi = ((canNangDto.getTrungBinh()) - canNang)
+                    / ((canNangDto.getTrungBinh()) - canNangDto.getCoi());
         } else {
             coi = 0.0;
         }
 
         double trungBinh = 0.0;
-        if (canNang >= canNangDto.getCoi() + Consts.saiSo && canNang < canNangDto.getTrungBinh()) {
-            trungBinh = (canNang - (canNangDto.getCoi() + Consts.saiSo))
-                    / (canNangDto.getTrungBinh() - (Consts.saiSo + canNangDto.getCoi()));
-        } else if (canNang <= canNangDto.getBeo() - Consts.saiSo && canNang >= canNangDto.getTrungBinh()) {
-            trungBinh = ((canNangDto.getBeo() - Consts.saiSo) - canNang)
-                    / ((canNangDto.getBeo() - Consts.saiSo) - canNangDto.getTrungBinh());
+        if (canNang >= canNangDto.getCoi() && canNang < canNangDto.getTrungBinh()) {
+            trungBinh = (canNang - (canNangDto.getCoi()))
+                    / (canNangDto.getTrungBinh() - (canNangDto.getCoi()));
+        } else if (canNang <= canNangDto.getNang() && canNang >= canNangDto.getTrungBinh()) {
+            trungBinh = ((canNangDto.getNang()) - canNang)
+                    / ((canNangDto.getNang()) - canNangDto.getTrungBinh());
         } else {
             trungBinh = 0.0;
         }
 
-        double beo = 0.0;
-        if (canNang >= canNangDto.getTrungBinh() + Consts.saiSo && canNang < canNangDto.getBeo()) {
-            beo = (canNang - (canNangDto.getTrungBinh() + Consts.saiSo))
-                    / (canNangDto.getBeo() - (Consts.saiSo + canNangDto.getTrungBinh()));
-        } else if (canNang <= canNangDto.getBeoPhi() - Consts.saiSo && canNang >= canNangDto.getBeo()) {
-            beo = ((canNangDto.getBeoPhi() - Consts.saiSo) - canNang)
-                    / ((canNangDto.getBeoPhi() - Consts.saiSo) - canNangDto.getBeo());
+        double nang = 0.0;
+        if (canNang >= canNangDto.getTrungBinh() && canNang < canNangDto.getNang()) {
+            nang = (canNang - (canNangDto.getTrungBinh()))
+                    / (canNangDto.getNang() - (canNangDto.getTrungBinh()));
+        } else if (canNang <= canNangDto.getRatNang() && canNang >= canNangDto.getNang()) {
+            nang = ((canNangDto.getRatNang()) - canNang)
+                    / ((canNangDto.getRatNang()) - canNangDto.getNang());
         } else {
-            beo = 0.0;
+            nang = 0.0;
         }
 
-        double beoPhi = 0.0;
-        if (canNang >= canNangDto.getBeo() + Consts.saiSo && canNang < canNangDto.getBeoPhi()) {
-            beoPhi = (canNang - (canNangDto.getBeo() + Consts.saiSo))
-                    / (canNangDto.getBeoPhi() - (Consts.saiSo + canNangDto.getBeo()));
-        } else if (canNang >= canNangDto.getBeoPhi()){
-            beoPhi = 1.0;
+        double ratNang = 0.0;
+        if (canNang >= canNangDto.getNang() && canNang < canNangDto.getRatNang()) {
+            ratNang = (canNang - (canNangDto.getNang()))
+                    / (canNangDto.getRatNang() - (canNangDto.getNang()));
+        } else if (canNang >= canNangDto.getRatNang()){
+            ratNang = 1.0;
         }
-        fuzzyCanNang.setBeoPhi(beoPhi);
-        fuzzyCanNang.setBeo(beo);
+        fuzzyCanNang.setRatNang(ratNang);
+        fuzzyCanNang.setNang(nang);
         fuzzyCanNang.setTrungBinh(trungBinh);
         fuzzyCanNang.setCoi(coi);
         fuzzyCanNang.setRatCoi(ratCoi);

@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import vn.htdttt.btl.projection.ResultSet;
+import vn.htdttt.btl.domain.ChieuCao;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,11 +17,11 @@ public class ChieuCaoDto {
     private double cao;
     private double ratCao;
 
-    public ChieuCaoDto(ResultSet resultSet) {
-        this.ratThap = resultSet.getRatThap();
-        this.thap = resultSet.getThap();
-        this.trungBinh = resultSet.getTrungBinh();
-        this.cao = resultSet.getCao();
-        this.ratCao = resultSet.getRatCao();
+    public ChieuCaoDto(ChieuCao chieuCao) {
+        this.ratThap = chieuCao.getRatThap();
+        this.thap = chieuCao.getThap();
+        this.trungBinh = chieuCao.getTrungBinh();
+        this.cao = chieuCao.getCao();
+        this.ratCao = chieuCao.getRatCao();
     }
 }

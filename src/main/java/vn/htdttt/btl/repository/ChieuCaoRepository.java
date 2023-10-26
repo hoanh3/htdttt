@@ -5,18 +5,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import vn.htdttt.btl.domain.ChieuCao;
-import vn.htdttt.btl.projection.ResultSet;
+import vn.htdttt.btl.dto.ChieuCaoDto;
 
 @Repository
 public interface ChieuCaoRepository extends JpaRepository<ChieuCao, Integer> {
-    @Query(value = "SELECT  " +
-            " cao.rat_thap ratThap , " +
-            " cao.thap thap ,  " +
-            " cao.trung_binh trungBinh , " +
-            " cao.cao cao , " +
-            " cao.rat_cao ratCao " +
-            " FROM tbl_chieucao cao  " +
-            " WHERE cao.tuoi = :tuoi AND LOWER(cao.gioi_tinh) = LOWER( :gioiTinh ) ", nativeQuery = true)
-    ResultSet getByTuoiAndGioiTinh(@Param("tuoi") int tuoi,
-                                   @Param("gioiTinh") String gioiTinh);
+    @Query("SELECT new vn.htdttt.btl.dto.ChieuCaoDto(entity) FROM ChieuCao entity where entity.tuoi = :tuoi and lower(entity.gioiTinh) = lower( :gioiTinh )")
+    ChieuCaoDto getByTuoiAndGioiTinh(@Param("tuoi") int tuoi, @Param("gioiTinh") String gioiTinh);
 }

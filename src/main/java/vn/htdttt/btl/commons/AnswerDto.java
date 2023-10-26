@@ -1,4 +1,4 @@
-package vn.htdttt.btl.dto;
+package vn.htdttt.btl.commons;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

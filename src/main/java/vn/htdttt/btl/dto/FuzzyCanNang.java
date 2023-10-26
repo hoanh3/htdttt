@@ -13,6 +13,6 @@ public class FuzzyCanNang {
     private double ratCoi;
     private double coi;
     private double trungBinh;
-    private double beo;
-    private double beoPhi;
+    private double nang;
+    private double ratNang;
 }
