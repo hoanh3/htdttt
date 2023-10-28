@@ -2,14 +2,12 @@ package vn.htdttt.btl.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import vn.htdttt.btl.commons.AnswerDto;
 import vn.htdttt.btl.consts.QuyTacDinhDuong;
 import vn.htdttt.btl.consts.TheChat;
 import vn.htdttt.btl.dto.*;
-import vn.htdttt.btl.repository.CanNangRepository;
-import vn.htdttt.btl.repository.ChieuCaoRepository;
-import vn.htdttt.btl.repository.TheChatRepository;
-import vn.htdttt.btl.repository.TuVanRepository;
+import vn.htdttt.btl.repository.*;
 import vn.htdttt.btl.service.NutritionConsultingService;
 import vn.htdttt.btl.utils.DinhDangPhanHoi;
 import vn.htdttt.btl.utils.MoHoaCanNang;
@@ -31,6 +29,7 @@ public class NutritionConsultingServiceImpl implements NutritionConsultingServic
     private final MoHoaCanNang moHoaCanNang;
     private final MoHoaDinhDuong moHoaDinhDuong;
     private final DinhDangPhanHoi dinhDangPhanHoi;
+    private final ThucDonRepository thucDonRepository;
 
     @Override
     public List<AnswerDto> getResponse(InputDataDto inputDataDto) {
@@ -51,6 +50,11 @@ public class NutritionConsultingServiceImpl implements NutritionConsultingServic
         result.add(new AnswerDto(tuVanDto.getLoiKhuyen()));
         result.add(new AnswerDto(tuVanDto.getThucPham()));
         result.add(new AnswerDto(tuVanDto.getChiTiet()));
+        ThucDonDto thucDonDto = thucDonRepository.getByDoTuoiAndIdTheChat(tuoi, theChatDto.getMucDo());
+        if (!ObjectUtils.isEmpty(thucDonDto)) {
+            String thucDon = thucDonDto.getThucDonChiTiet() + " " + thucDonDto.getGhiChu();
+            result.add(new AnswerDto(thucDon));
+        }
         return result;
     }
 
