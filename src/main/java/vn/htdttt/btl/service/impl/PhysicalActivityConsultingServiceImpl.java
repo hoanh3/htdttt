@@ -3,7 +3,6 @@ package vn.htdttt.btl.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import vn.htdttt.btl.commons.AnswerDto;
 import vn.htdttt.btl.consts.LoaiVanDong;
@@ -50,9 +49,13 @@ public class PhysicalActivityConsultingServiceImpl implements PhysicalActivityCo
 
         List<AnswerDto> result = new ArrayList<>();
         result.add(new AnswerDto(dinhDangPhanHoi.getTuVanVanDong(loaiBaiTapDto)));
-        Page<BaiTapVanDongDto> baiTapVanDongDtos = baiTapVanDongRepository.getByDoTuoiAAndLoaiBaiTap(tuoi, loaiBaiTapDto.getLoai(), PageRequest.of(0, 3));
+        Page<BaiTapVanDongDto> baiTapVanDongDtos = baiTapVanDongRepository
+                .getByDoTuoiAAndLoaiBaiTap(tuoi, loaiBaiTapDto.getLoai(), PageRequest.of(0, 3));
         baiTapVanDongDtos.forEach(baiTap -> {
-            String tuVan = baiTap.getTenBaiTap() + " " + baiTap.getMoTa() + "<br> &#9658 Thời gian thực hiện: " + baiTap.getThoiGian() + "phút.";
+            String tuVan = baiTap.getTenBaiTap() + " "
+                    + baiTap.getMoTa()
+                    + "<br> &#9658 Thời gian thực hiện: "
+                    + baiTap.getThoiGian() + "phút.";
             result.add(new AnswerDto(tuVan));
         });
         return result;

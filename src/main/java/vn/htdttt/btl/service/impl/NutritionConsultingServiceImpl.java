@@ -46,7 +46,7 @@ public class NutritionConsultingServiceImpl implements NutritionConsultingServic
 
         List<AnswerDto> result = new ArrayList<>();
         result.add(new AnswerDto(dinhDangPhanHoi.getTuVanTheChat(theChatDto)));
-        TuVanDto tuVanDto = tuVanRepository.getByMucDo(theChatDto.getMucDo());
+        TuVanDto tuVanDto = tuVanRepository.getByMucDoAndTuoi(theChatDto.getMucDo(), tuoi);
         result.add(new AnswerDto(tuVanDto.getLoiKhuyen()));
         result.add(new AnswerDto(tuVanDto.getThucPham()));
         result.add(new AnswerDto(tuVanDto.getChiTiet()));

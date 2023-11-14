@@ -17,6 +17,10 @@ public class TuVan {
     @Id
     @Column(name = "id")
     private int id;
+    @Column(name = "do_tuoi_tu")
+    private int doTuoiTu;
+    @Column(name = "do_tuoi_den")
+    private int doTuoiDen;
     @Column(name = "thuc_pham")
     private String thucPham;
     @Column(name = "loi_khuyen")
