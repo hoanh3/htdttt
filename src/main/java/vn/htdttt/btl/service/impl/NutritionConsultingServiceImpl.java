@@ -40,7 +40,7 @@ public class NutritionConsultingServiceImpl implements NutritionConsultingServic
 
         FuzzyChieuCao fuzzyChieuCao = moHoaChieuCao.moHoaChieuCao(chieuCaoDto, inputDataDto.getChieuCao());
         FuzzyCanNang fuzzyCanNang = moHoaCanNang.moHoaCanNang(canNangDto, inputDataDto.getCanNang());
-        FuzzyDinhDuong fuzzyDinhDuong = moHoaDinhDuong.moHoaDinhDuong(fuzzyCanNang, fuzzyChieuCao);
+        FuzzyDinhDuong fuzzyDinhDuong = moHoaDinhDuong.apDungTapLuat(fuzzyCanNang, fuzzyChieuCao);
 
         TheChatDto theChatDto = giaiMo(fuzzyDinhDuong);
 

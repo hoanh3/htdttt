@@ -19,7 +19,7 @@ import java.util.Map;
 public class MoHoaDinhDuong {
     private final LuatDinhDuongRepository luatDinhDuongRepository;
 
-    public FuzzyDinhDuong moHoaDinhDuong(FuzzyCanNang fuzzyCanNang, FuzzyChieuCao fuzzyChieuCao) {
+    public FuzzyDinhDuong apDungTapLuat(FuzzyCanNang fuzzyCanNang, FuzzyChieuCao fuzzyChieuCao) {
         HashMap<String, Double> chieuCao = new HashMap<>();
         chieuCao.put(LoaiChieuCao.RAT_THAP.getColumnName(), fuzzyChieuCao.getRatThap());
         chieuCao.put(LoaiChieuCao.THAP.getColumnName(), fuzzyChieuCao.getThap());
@@ -37,13 +37,13 @@ public class MoHoaDinhDuong {
         FuzzyDinhDuong fuzzyDinhDuong = new FuzzyDinhDuong();
         for(Map.Entry<String, Double> cao : chieuCao.entrySet()) {
             String colChieuCao = cao.getKey();
-            double valChieuCao = cao.getValue();
+            double giaTriThuocTinhChieuCao = cao.getValue();
             double epsilon = 1e-10;
-            if(Math.abs(valChieuCao - 0.0) > epsilon) {
+            if(Math.abs(giaTriThuocTinhChieuCao - 0.0) > epsilon) {
                 for(Map.Entry<String, Double> nang : canNang.entrySet()) {
                     String colCanNang = nang.getKey();
-                    double valCanNang = nang.getValue();
-                    double fuzzyValue = Math.min(valChieuCao, valCanNang);
+                    double giaTriThuocTinhCanNang = nang.getValue();
+                    double fuzzyValue = Math.min(giaTriThuocTinhChieuCao, giaTriThuocTinhCanNang);
                     LuatDinhDuong luatDinhDuong = luatDinhDuongRepository.getByDtCanNangAndDtChieuCao(colCanNang, colChieuCao);
                     if(luatDinhDuong.getMucDoDinhDuong().getMucDo() == TheChat.SUY_DINH_DUONG_NANG.getMucDo()) {
                         fuzzyDinhDuong.setMuc1(Math.max(fuzzyDinhDuong.getMuc1(), fuzzyValue));
